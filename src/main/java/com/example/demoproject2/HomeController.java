@@ -33,10 +33,9 @@ public class HomeController {
     }
 
     @FXML
-    private void openEmployees() {
-        showMessage("Employees view is not implemented yet.");
+    private void openEmployees(){
+        SceneManager.switchScene("EmployeeView.fxml", "Employees");
     }
-
     @FXML
     private void handleLogout() {
         AuthService.logout();

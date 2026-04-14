@@ -5,9 +5,9 @@
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="14"
-      xmlns="http://javafx.com/javafx/17"
+      xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.miniprojecta.EmployeeController">
+      fx:controller="com.example.demoproject2.EmployeeController">
 
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
@@ -17,7 +17,7 @@
 
     <TextField fx:id="tfSearch" promptText="Search employee..."/>
 
-    <TableView fx:id="table" prefHeight="250">
+    <TableView fx:id="employeeTable" prefHeight="250">
         <columns>
             <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
             <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
@@ -38,11 +38,7 @@
         <Button text="Update" onAction="#handleUpdate"/>
         <Button text="Delete" onAction="#handleDelete"/>
         <Button text="Clear" onAction="#handleClear"/>
-
+        <Button text="Back" onAction="#goHome"/>
     </HBox>
-
-    fx:controller="com.example.demoproject2.EmployeeController"
-    fx:id="employeeTable"
-    <Button text="Back" onAction="#goHome"/>
 
 </VBox>
