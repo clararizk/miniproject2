@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.miniprojecta.EmployeeController">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Employee Management"/>
+
+    <TextField fx:id="tfSearch" promptText="Search employee..."/>
+
+    <TableView fx:id="table" prefHeight="250">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="180"/>
+            <TableColumn fx:id="colDepartment" text="Department" prefWidth="120"/>
+            <TableColumn fx:id="colSalary" text="Salary" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <TextField fx:id="tfId" promptText="ID"/>
+    <TextField fx:id="tfName" promptText="Name"/>
+    <TextField fx:id="tfEmail" promptText="Email"/>
+    <TextField fx:id="tfDepartment" promptText="Department"/>
+    <TextField fx:id="tfSalary" promptText="Salary"/>
+
+    <HBox spacing="10">
+        <Button text="Add" onAction="#handleAdd"/>
+        <Button text="Update" onAction="#handleUpdate"/>
+        <Button text="Delete" onAction="#handleDelete"/>
+        <Button text="Clear" onAction="#handleClear"/>
+
+    </HBox>
+
+    fx:controller="com.example.demoproject2.EmployeeController"
+    fx:id="employeeTable"
+    <Button text="Back" onAction="#goHome"/>
+
+</VBox>
