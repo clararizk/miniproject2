@@ -21,28 +21,17 @@ public class EmployeeController {
     @FXML private TextField tfSearch;
 
     private final EmployeeStore store = EmployeeStore.getInstance();
+    private FilteredList<Employee> filtered;
 
     @FXML
     public void initialize() {
-
         colId.setCellValueFactory(data -> data.getValue().idProperty());
         colName.setCellValueFactory(data -> data.getValue().nameProperty());
         colEmail.setCellValueFactory(data -> data.getValue().emailProperty());
         colDepartment.setCellValueFactory(data -> data.getValue().departmentProperty());
         colSalary.setCellValueFactory(data -> data.getValue().salaryProperty());
 
-        FilteredList<Employee> filtered = new FilteredList<>(store.getEmployees(), p -> true);
-
-        tfSearch.textProperty().addListener((obs, oldVal, newVal) -> {
-            filtered.setPredicate(emp -> {
-                if (newVal == null || newVal.isEmpty()) return true;
-                String search = newVal.toLowerCase();
-                return emp.getName().toLowerCase().contains(search)
-                        || emp.getEmail().toLowerCase().contains(search);
-            });
-        });
-
-        employeeTable.setItems(filtered);
+        loadEmployees();
 
         employeeTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, emp) -> {
             if (emp != null) {
@@ -55,10 +44,33 @@ public class EmployeeController {
         });
     }
 
+    private void loadEmployees() {
+        filtered = new FilteredList<>(store.getEmployees(), p -> true);
+
+        tfSearch.textProperty().addListener((obs, oldVal, newVal) -> {
+            filtered.setPredicate(emp -> {
+                if (newVal == null || newVal.trim().isEmpty()) {
+                    return true;
+                }
+
+                String search = newVal.toLowerCase().trim();
+
+                return String.valueOf(emp.getId()).contains(search)
+                        || emp.getName().toLowerCase().contains(search)
+                        || emp.getEmail().toLowerCase().contains(search)
+                        || emp.getDepartment().toLowerCase().contains(search)
+                        || String.valueOf(emp.getSalary()).contains(search);
+            });
+        });
+
+        employeeTable.setItems(filtered);
+    }
+
     @FXML
     private void handleAdd() {
         try {
-            int id = Integer.parseInt(tfId.getText());
+            int id = Integer.parseInt(tfId.getText().trim());
+            double salary = Double.parseDouble(tfSalary.getText().trim());
 
             if (store.idExists(id)) {
                 showAlert("ID already exists!");
@@ -67,13 +79,14 @@ public class EmployeeController {
 
             Employee emp = new Employee(
                     id,
-                    tfName.getText(),
-                    tfEmail.getText(),
-                    tfDepartment.getText(),
-                    Double.parseDouble(tfSalary.getText())
+                    tfName.getText().trim(),
+                    tfEmail.getText().trim(),
+                    tfDepartment.getText().trim(),
+                    salary
             );
 
             store.addEmployee(emp);
+            loadEmployees();
             clearFields();
 
         } catch (Exception e) {
@@ -84,10 +97,14 @@ public class EmployeeController {
     @FXML
     private void handleUpdate() {
         Employee selected = employeeTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
+        if (selected == null) {
+            showAlert("Please select an employee.");
+            return;
+        }
 
         try {
-            int id = Integer.parseInt(tfId.getText());
+            int id = Integer.parseInt(tfId.getText().trim());
+            double salary = Double.parseDouble(tfSalary.getText().trim());
 
             if (store.idExistsExcluding(id, selected)) {
                 showAlert("ID already exists!");
@@ -96,14 +113,15 @@ public class EmployeeController {
 
             Employee updated = new Employee(
                     id,
-                    tfName.getText(),
-                    tfEmail.getText(),
-                    tfDepartment.getText(),
-                    Double.parseDouble(tfSalary.getText())
+                    tfName.getText().trim(),
+                    tfEmail.getText().trim(),
+                    tfDepartment.getText().trim(),
+                    salary
             );
 
             store.updateEmployee(selected, updated);
-            employeeTable.refresh();
+            loadEmployees();
+            clearFields();
 
         } catch (Exception e) {
             showAlert("Invalid input!");
@@ -113,8 +131,20 @@ public class EmployeeController {
     @FXML
     private void handleDelete() {
         Employee selected = employeeTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
+        if (selected == null) {
+            showAlert("Please select an employee.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Employee");
+        confirm.setHeaderText("Delete \"" + selected.getName() + "\"?");
+        confirm.setContentText("This action cannot be undone.");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             store.deleteEmployee(selected);
+            loadEmployees();
+            clearFields();
         }
     }
 
@@ -134,6 +164,8 @@ public class EmployeeController {
         tfEmail.clear();
         tfDepartment.clear();
         tfSalary.clear();
+        tfSearch.clear();
+        employeeTable.getSelectionModel().clearSelection();
     }
 
     private void showAlert(String msg) {

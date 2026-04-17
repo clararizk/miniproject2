@@ -1,24 +1,33 @@
 package com.example.demoproject2;
 
-import java.util.HashMap;
-import java.util.Map;
-public class AuthService {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-    private static final Map<String, String> users = new HashMap<>();
+public class AuthService {
     private static String currentUser;
 
-    static {
-        users.put("student1", "1111");
-        users.put("student2", "2222");
-        users.put("student3", "3333");
-        users.put("student4", "4444");
-    }
-
     public static boolean login(String username, String password) {
-        if (users.containsKey(username) && users.get(username).equals(password)) {
-            currentUser = username;
-            return true;
+        String sql = "SELECT * FROM accounts WHERE username = ? AND password = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                currentUser = username;
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
         return false;
     }
 
